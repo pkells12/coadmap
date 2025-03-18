@@ -4,4 +4,4 @@ __pycache__/
 *$py.class
 venv/
 .DS_Store
-roadmaps/
+roadmaps/.DS_Store

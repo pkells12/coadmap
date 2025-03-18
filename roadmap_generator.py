@@ -101,88 +101,78 @@ async def generate_roadmap_with_questions(idea_description, animation_type=Anima
                 status_callback(f"❌ Error: {str(e)}")
             raise
         
-        # Ask the user questions interactively to customize the roadmap
-        if status_callback:
-            status_callback("Please answer the following questions to customize your roadmap:")
+        print("\nBased on the roadmap analysis, please answer these questions to help customize it further:")
+        print("(Press Enter to skip any question you don't know or don't care about)\n")
         
+        # Ask questions and collect answers
         answers = {}
-        for i, (question, options) in enumerate(questions.items(), 1):
-            print(f"\n{i}. {question}")
-            
-            if isinstance(options, list):
-                # Multiple choice question
-                for j, option in enumerate(options, 1):
-                    print(f"   {j}) {option}")
-                
-                # Validate input
-                while True:
-                    try:
-                        choice = int(input("   Enter your choice (number): "))
-                        if 1 <= choice <= len(options):
-                            answers[question] = options[choice-1]
-                            break
-                        else:
-                            print(f"   Please enter a number between 1 and {len(options)}")
-                    except ValueError:
-                        print("   Please enter a valid number")
-            else:
-                # Open-ended question
-                answers[question] = input("   Your answer: ")
+        for i, (question_key, question_text) in enumerate(questions.items(), 1):
+            user_answer = input(f"{i}. {question_text}\n   > ")
+            if user_answer.strip():
+                answers[question_key] = user_answer
         
-        # Generate final roadmap with answers
-        reflection_animation = LoadingAnimation("Enhancing roadmap based on your answers", animation_type)
+        # Step 2: Reflection process with animation - use the same style as initial generation
+        reflection_animation = LoadingAnimation("Starting reflection process with your input", animation_type)
         reflection_animation.start()
         
         try:
-            # Call the reflection API with the user's answers
+            # Package the answers with the roadmap for reflection
             final_roadmap = client.reflect_on_roadmap_with_answers(initial_roadmap, idea_description, answers)
-            
             reflection_animation.stop()
             
             if status_callback:
-                status_callback("✅ Enhanced roadmap generated based on your input!")
-            
-            return final_roadmap
+                status_callback("✅ Roadmap customization complete!")
         except Exception as e:
             reflection_animation.stop()
-            logger.error(f"Error reflecting on roadmap: {str(e)}")
+            logger.error(f"Error during reflection process: {str(e)}")
             if status_callback:
                 status_callback(f"❌ Error: {str(e)}")
             raise
+        
+        return final_roadmap
+    except ServiceOverloadedError as e:
+        logger.error(f"Service overloaded even after retries: {str(e)}")
+        if status_callback:
+            status_callback("❌ Error: Service is currently overloaded. The application has attempted to retry but was unsuccessful.")
+        raise Exception("Service is currently overloaded. Please try again later with exponential backoff.")
     except Exception as e:
-        logger.error(f"Error in roadmap generation with questions: {str(e)}")
+        logger.error(f"Error generating roadmap with questions: {str(e)}")
+        if status_callback:
+            status_callback(f"❌ Error: {str(e)}")
         raise
 
 def generate_questions_from_roadmap(roadmap, idea_description):
     """
-    Generate customization questions based on the roadmap content.
+    Generate relevant questions based on the roadmap content.
+    Uses Claude to generate specific questions based on the roadmap content.
     
-    Returns a dictionary of questions with either list of options (for multiple choice)
-    or None (for open-ended questions).
+    Returns a dictionary of question_key: question_text pairs
     """
-    # These are generic questions that work well for most projects
-    questions = {
-        "What is your team size?": ["Solo developer", "Small team (2-5 people)", "Medium team (6-15 people)", "Large team (15+ people)"],
-        "What is your experience level with the technologies mentioned in the roadmap?": ["Beginner", "Intermediate", "Advanced", "Mix of experience levels"],
-        "What is your timeline for this project?": ["Quick prototype (days)", "Short-term project (weeks)", "Medium-term project (months)", "Long-term project (6+ months)"],
-        "What are your top priority features for the MVP?": None,
-        "Are there any specific technologies or frameworks you want to use?": None,
-    }
+    # Create a new instance of ClaudeClient
+    client = ClaudeClient()
     
-    return questions
+    try:
+        # Use Claude to generate questions specific to this roadmap
+        questions = client.generate_questions_for_roadmap(roadmap, idea_description)
+        
+        return questions
+    except ServiceOverloadedError as e:
+        logger.error(f"Service overloaded even after retries when generating questions: {str(e)}")
+        raise Exception("Service is currently overloaded while generating questions. Please try again later.")
+    except Exception as e:
+        logger.error(f"Error generating questions from roadmap: {str(e)}")
+        raise
 
 def main():
-    """
-    Main function to run the roadmap generator from the command line.
-    """
-    parser = argparse.ArgumentParser(description="Generate a coding roadmap for your app idea")
-    parser.add_argument("idea", help="Your app idea description")
-    parser.add_argument("--animation", choices=["spinner", "dots", "bar", "typing"], default="spinner", help="Animation type")
-    parser.add_argument("--interactive", action="store_true", help="Use interactive mode with customization questions")
-    
+    parser = argparse.ArgumentParser(description='Generate a project roadmap with dynamic loading indicators')
+    parser.add_argument('--animation', choices=['spinner', 'dots', 'bar', 'typing'], default='spinner',
+                      help='Type of animation to display during processing')
+    parser.add_argument('--idea', type=str, required=True, help='Your project idea description')
+    parser.add_argument('--with-questions', action='store_true', help='Enable customization questions')
+    parser.add_argument('--output', type=str, help='Output file to save the roadmap')
     args = parser.parse_args()
     
-    # Map string to enum
+    # Map string argument to enum
     animation_map = {
         'spinner': AnimationType.SPINNER,
         'dots': AnimationType.DOTS,
@@ -191,24 +181,33 @@ def main():
     }
     animation_type = animation_map.get(args.animation, AnimationType.SPINNER)
     
-    if args.interactive:
-        # Interactive mode with questions
-        roadmap = generate_roadmap_with_questions(args.idea, animation_type)
-    else:
-        # Simple mode without questions
-        loading_animation = LoadingAnimation("Generating roadmap based on your idea", animation_type)
-        loading_animation.start()
+    try:
+        if args.with_questions:
+            # Generate roadmap with user customization questions
+            roadmap = asyncio.run(generate_roadmap_with_questions(args.idea, animation_type))
+        else:
+            # Generate roadmap without questions
+            roadmap = asyncio.run(generate_roadmap(args.idea))
         
-        try:
-            roadmap = generate_roadmap(args.idea)
-            loading_animation.stop()
-        except Exception as e:
-            loading_animation.stop()
-            print(f"Error: {str(e)}")
-            return
-    
-    print("\nRoadmap generated:")
-    print(roadmap)
+        print("\nRoadmap generation complete!")
+        
+        if args.output:
+            import os
+            # Ensure roadmaps directory exists
+            os.makedirs('roadmaps', exist_ok=True)
+            # Save to roadmaps directory
+            file_path = os.path.join('roadmaps', args.output)
+            with open(file_path, 'w') as f:
+                f.write(roadmap)
+            print(f"Roadmap saved to {file_path}")
+        else:
+            print("\n" + roadmap)
+    except Exception as e:
+        print(f"\nError: {str(e)}")
+        logger.error(f"Main process error: {str(e)}")
+        import sys
+        sys.exit(1)
 
 if __name__ == "__main__":
+    import asyncio
     main()
