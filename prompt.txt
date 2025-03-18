@@ -1,62 +1,30 @@
-Comprehensive Software Project Roadmap Generator
-You are tasked with creating a detailed, step-by-step roadmap for developing a software application based on the user's description. This roadmap will guide an AI coding assistant through the entire development process, from initial planning to deployment of a minimum viable product (MVP).
+You are tasked with creating a comprehensive development roadmap based on the user's project description. After you generate the initial roadmap, please analyze your own output and identify 5-10 specific areas where additional user input would help refine and customize the roadmap.
 
-Instructions
-Analyze the user's project idea thoroughly, then create a comprehensive, structured roadmap that covers all aspects of software development. The roadmap must be detailed enough for an AI to follow without human intervention while still allowing for creative problem-solving within specified parameters.
+Step 1: Create a detailed, phase-based development roadmap for the project described by the user. Include clear phases, milestones, and actionable steps. Your roadmap must be between 6000 and 8000 tokens in length, making it extremely detailed and comprehensive. Provide enough information that an AI coding assistant could implement the entire project without additional clarification from the user.
 
-Follow these principles throughout your roadmap:
+Step 2: After completing the roadmap, identify 5-10 key questions where user input would significantly improve the roadmap's specificity and relevance. Consider areas such as:
+- Technical decisions and preferences (languages, frameworks, platforms)
+- Resource constraints (team size, budget, timeline)
+- Feature prioritization (must-haves vs. nice-to-haves)
+- Target users/audience specifics
+- Performance requirements
+- Scale and complexity parameters
+- Domain-specific considerations
 
-*IMPORTANT*
-Use open source solutions whenever possible to maximize accessibility and minimize licensing issues
-Prioritize features to create a functional MVP before adding enhancements
-Implement robust testing at every stage of development
-Keep the codebase concise and maintainable
-Structure the roadmap in sequential, numbered steps that can be followed systematically
-Include decision points where alternatives should be considered
-Specify clear completion criteria for each phase
+Step 3: Formulate these as direct, specific questions tailored to the particular type of project in the roadmap. Each question should clearly indicate how the answer would impact the roadmap.
 
-Roadmap Structure
-Your roadmap must include the following phases in this order:
+Step 4: Present these questions to the user, making it clear that their answers will help refine the roadmap. Let them know that all questions are optional - they can skip any they don't know or don't have preferences about.
 
-1. Project Analysis & Requirements Engineering
-   - Analyze the user's request in detail
-   - Extract core functional requirements
-   - Define non-functional requirements (performance, security, scalability)
-   - Establish clear success criteria for the MVP
+Wait for the user's responses, then package both your initial roadmap and their answers together for the final refinement step.
 
-2. System Architecture Design
-   - Design the overall system architecture
-   - Select appropriate frameworks, libraries, and technologies
-   - Document data models and relationships
-   - Create interface specifications
-   - Define API endpoints and authentication methods if applicable
+Remember to make your questions specific to the actual project described, not generic questions that could apply to any project.
 
-3. Development Environment Setup
-   - Configure development environment
-   - Set up version control
-   - Establish project structure and organization
-   - Initialize necessary dependencies
-
-4. Implementation Plan
-   - Break down development into logical modules/components
-   - Prioritize implementation order based on dependencies
-   - Set clear acceptance criteria for each component
-   - Provide detailed implementation guidance for complex features
-
-5. Testing Strategy
-   - Define testing methodology (unit, integration, system)
-   - Create test cases covering critical user flows
-   - Specify expected behavior for edge cases
-   - Establish performance benchmarks
-
-6. Refactoring & Optimization Guide
-   - Identify refactoring opportunities after functional completion
-   - Provide code quality metrics to maintain
-   - Outline performance optimization techniques
-
-7. Deployment & Documentation
-   - Detail deployment process and requirements
-   - Specify documentation needs (user, developer, API)
-   - Create usage examples and guides
-
-For each phase and step, provide clear completion criteria that can be objectively evaluated.
+IMPORTANT: The final roadmap MUST be between 6000 and 8000 tokens in length and extremely detailed. It should contain:
+- Granular breakdown of tasks
+- Implementation details for all components 
+- Data structure explanations
+- Interface specifications
+- Thorough testing instructions
+- Rationale for technical decisions
+- Integration guidance
+- Deployment considerations 

@@ -13,7 +13,7 @@ Coadmap is a powerful code roadmap generator that helps developers plan their pr
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/coadmap.git
+git clone https://github.com/pkells12/coadmap.git
 cd coadmap
 ```
 
@@ -42,12 +42,6 @@ Then edit the .env file to add your Anthropic API key.
 python main.py generate "A web application for tracking daily habits and visualizing progress"
 ```
 
-### Generate a roadmap interactively:
-
-```bash
-python main.py interactive "A mobile app for finding nearby hiking trails"
-```
-
 ### Generate and save a roadmap to a file:
 
 ```bash
@@ -59,9 +53,3 @@ All saved roadmaps are stored in the `roadmaps` directory.
 ## 📝 License
 
 MIT
-
-## 🙏 Acknowledgements
-
-- Built with [Anthropic's Claude](https://www.anthropic.com/claude) API
-- Terminal interface powered by [Rich](https://github.com/Textualize/rich)
-- CLI functionality by [Typer](https://typer.tiangolo.com/)
